@@ -6,7 +6,6 @@ import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 
 export default function Navbar() {
-
   const router = useRouter()
 
   const [user, setUser] = useState(null)
@@ -14,38 +13,32 @@ export default function Navbar() {
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
-
     getUser()
-
   }, [])
 
   useEffect(() => {
+    function handleResize() {
+      setIsMobile(window.innerWidth < 768)
+    }
 
-  function handleResize() {
-    setIsMobile(window.innerWidth < 768)
-  }
+    handleResize()
 
-  handleResize()
+    window.addEventListener('resize', handleResize)
 
-  window.addEventListener('resize', handleResize)
-
-  return () => {
-    window.removeEventListener('resize', handleResize)
-  }
-
-}, [])
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
 
   async function getUser() {
-
     const {
-      data: { session }
+      data: { session },
     } = await supabase.auth.getSession()
 
     setUser(session?.user || null)
   }
 
   async function handleLogout() {
-
     await supabase.auth.signOut()
 
     setUser(null)
@@ -55,95 +48,67 @@ export default function Navbar() {
 
   return (
     <nav style={nav}>
-
       {/* LOGO */}
-      <Link
-        href="/"
-        style={logo}
-      >
+      <Link href="/" style={logo}>
         🐾 Refugios Mascotas
       </Link>
 
       {isMobile && (
-  <button
-    onClick={() => setMenuOpen(!menuOpen)}
-    style={hamburger}
-  >
-    ☰
-  </button>
-)}
+        <button onClick={() => setMenuOpen(!menuOpen)} style={hamburger}>
+          ☰
+        </button>
+      )}
 
       {/* LINKS */}
-<div
-  style={
-    isMobile
-      ? menuOpen
-        ? { ...links, ...mobileMenuOpen }
-        : { display: 'none' }
-      : links
-  }
->
-
-  <Link href="/" style={link}>
-    Inicio
-  </Link>
-
-  <Link href="/mascotas" style={link}>
-    Mascotas
-  </Link>
-
-  {user && (
-    <>
-      <Link
-        href="/mascotas/nueva"
-        style={link}
+      <div
+        style={
+          isMobile
+            ? menuOpen
+              ? { ...links, ...mobileMenuOpen }
+              : { display: 'none' }
+            : links
+        }
       >
-        Publicar
-      </Link>
+        <Link href="/" style={link}>
+          Inicio
+        </Link>
 
-      <Link
-        href="/favoritos"
-        style={link}
-      >
-        Favoritos
-      </Link>
+        <Link href="/mascotas" style={link}>
+          Mascotas
+        </Link>
 
-      <Link
-  href="/mis-publicaciones"
-  style={link}
->
-  Mis publicaciones
-</Link>
-    </>
-  )}
+        {user && (
+          <>
+            <Link href="/mascotas/nueva" style={link}>
+              Publicar
+            </Link>
 
-  {!user ? (
-    <>
-      <Link
-        href="/login"
-        style={link}
-      >
-        Login
-      </Link>
+            <Link href="/favoritos" style={link}>
+              Favoritos
+            </Link>
 
-      <Link
-        href="/register"
-        style={registerButton}
-      >
-        Registrarse
-      </Link>
-    </>
-  ) : (
-    <button
-      onClick={handleLogout}
-      style={logoutButton}
-    >
-      Cerrar sesión
-    </button>
-  )}
+            <Link href="/mis-publicaciones" style={link}>
+              Mis publicaciones
+            </Link>
+          </>
+        )}
 
-</div>
+        {!user ? (
+          <>
+            <Link href="/login" style={link}>
+              Login
+            </Link>
 
+            <Link href="/register" style={registerButton}>
+              Registrarse
+            </Link>
+          </>
+        ) : (
+          <button onClick={handleLogout} style={logoutButton}>
+            Cerrar sesión
+          </button>
+        )}
+      </div>
     </nav>
   )
 }
@@ -164,7 +129,7 @@ const nav = {
   top: 0,
   zIndex: 999,
 
-  boxSizing: 'border-box'
+  boxSizing: 'border-box',
 }
 
 const logo = {
@@ -176,19 +141,19 @@ const logo = {
   display: 'flex',
   alignItems: 'center',
 
-  flexShrink: 0
+  flexShrink: 0,
 }
 
 const links = {
   display: 'flex',
   gap: 14,
-  alignItems: 'center'
+  alignItems: 'center',
 }
 
 const link = {
   textDecoration: 'none',
   color: '#374151',
-  fontWeight: 500
+  fontWeight: 500,
 }
 
 const registerButton = {
@@ -197,7 +162,7 @@ const registerButton = {
   color: '#fff',
   padding: '10px 14px',
   borderRadius: 10,
-  fontWeight: 600
+  fontWeight: 600,
 }
 
 const logoutButton = {
@@ -207,7 +172,7 @@ const logoutButton = {
   padding: '10px 14px',
   borderRadius: 10,
   fontWeight: 600,
-  cursor: 'pointer'
+  cursor: 'pointer',
 }
 
 const hamburger = {
@@ -219,7 +184,7 @@ const hamburger = {
 
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center'
+  justifyContent: 'center',
 }
 
 const mobileMenuOpen = {
@@ -232,5 +197,5 @@ const mobileMenuOpen = {
   boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
   flexDirection: 'column',
   alignItems: 'flex-start',
-  gap: 16
+  gap: 16,
 }

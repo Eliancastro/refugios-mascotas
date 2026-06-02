@@ -10,36 +10,32 @@ export default function NuevaMascota() {
   const [preview, setPreview] = useState(null)
 
   const [form, setForm] = useState({
-  urgent: false,
-  estado: 'adopcion',
-  tipo: '',
-  raza: '',
-  edad: '',
-  tamano: '',
-  descripcion: '',
-  ciudad: '',
-  telefono: '',
-  nombre_contacto: '',
-})
+    urgent: false,
+    estado: 'adopcion',
+    tipo: '',
+    raza: '',
+    edad: '',
+    tamano: '',
+    descripcion: '',
+    ciudad: '',
+    telefono: '',
+    nombre_contacto: '',
+  })
 
   const [file, setFile] = useState(null)
   useEffect(() => {
+    async function checkUser() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
 
-  async function checkUser() {
-
-    const {
-      data: { session }
-    } = await supabase.auth.getSession()
-
-    if (!session) {
-      router.push('/login')
+      if (!session) {
+        router.push('/login')
+      }
     }
 
-  }
-
-  checkUser()
-
-}, [])
+    checkUser()
+  }, [])
 
   function handleChange(e) {
     setForm((prev) => ({
@@ -80,52 +76,47 @@ export default function NuevaMascota() {
         const fileExt = file.name.split('.').pop()
         const filePath = `${Date.now()}.${fileExt}`
 
-        const { error: uploadError } = await supabase
-          .storage
+        const { error: uploadError } = await supabase.storage
           .from('mascotas')
           .upload(filePath, file)
 
         if (uploadError) throw uploadError
 
-        const { data } = supabase
-          .storage
+        const { data } = supabase.storage
           .from('mascotas')
           .getPublicUrl(filePath)
 
         imageUrl = data.publicUrl
       }
 
-      const { error } = await supabase
-        .from('mascotas')
-        .insert({
-          ...form,
-          tipo: form.tipo.trim(),
-          raza: form.raza.trim(),
-          edad: form.edad.trim(),
-          tamano: form.tamano.trim(),
-          descripcion: form.descripcion.trim(),
-          imagen_url: imageUrl,
-        })
+      const { error } = await supabase.from('mascotas').insert({
+        ...form,
+        tipo: form.tipo.trim(),
+        raza: form.raza.trim(),
+        edad: form.edad.trim(),
+        tamano: form.tamano.trim(),
+        descripcion: form.descripcion.trim(),
+        imagen_url: imageUrl,
+      })
 
       if (error) throw error
 
       alert('Mascota cargada correctamente 🐾')
 
       setForm({
-  estado: 'adopcion',
-  tipo: '',
-  raza: '',
-  edad: '',
-  tamano: '',
-  descripcion: '',
-  ciudad: '',
-  telefono: '',
-  nombre_contacto: '',
-})
+        estado: 'adopcion',
+        tipo: '',
+        raza: '',
+        edad: '',
+        tamano: '',
+        descripcion: '',
+        ciudad: '',
+        telefono: '',
+        nombre_contacto: '',
+      })
 
       setFile(null)
       setPreview(null)
-
     } catch (err) {
       alert(err.message)
     }
@@ -142,7 +133,6 @@ export default function NuevaMascota() {
         </p>
 
         <form onSubmit={handleSubmit} style={formStyle}>
-
           {/* Estado */}
           <div>
             <label style={label}>Estado</label>
@@ -157,19 +147,18 @@ export default function NuevaMascota() {
               <option value="encontrada">Encontrada</option>
             </select>
             <label style={checkboxLabel}>
-  <input
-    type="checkbox"
-    checked={form.urgent}
-    onChange={(e) =>
-      setForm({
-        ...form,
-        urgent: e.target.checked
-      })
-    }
-  />
-
-  🚨 Publicación urgente
-</label>
+              <input
+                type="checkbox"
+                checked={form.urgent}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    urgent: e.target.checked,
+                  })
+                }
+              />
+              🚨 Publicación urgente
+            </label>
           </div>
 
           {/* Tipo + Raza */}
@@ -237,40 +226,40 @@ export default function NuevaMascota() {
           </div>
 
           {/* Contacto */}
-<div style={row}>
-  <div style={column}>
-    <label style={label}>Nombre de contacto</label>
-    <input
-      name="nombre_contacto"
-      value={form.nombre_contacto}
-      placeholder="Tu nombre"
-      onChange={handleChange}
-      style={input}
-    />
-  </div>
+          <div style={row}>
+            <div style={column}>
+              <label style={label}>Nombre de contacto</label>
+              <input
+                name="nombre_contacto"
+                value={form.nombre_contacto}
+                placeholder="Tu nombre"
+                onChange={handleChange}
+                style={input}
+              />
+            </div>
 
-  <div style={column}>
-    <label style={label}>Teléfono / WhatsApp</label>
-    <input
-      name="telefono"
-      value={form.telefono}
-      placeholder="Ej: 5491122334455"
-      onChange={handleChange}
-      style={input}
-    />
-  </div>
-</div>
+            <div style={column}>
+              <label style={label}>Teléfono / WhatsApp</label>
+              <input
+                name="telefono"
+                value={form.telefono}
+                placeholder="Ej: 5491122334455"
+                onChange={handleChange}
+                style={input}
+              />
+            </div>
+          </div>
 
-<div>
-  <label style={label}>Ciudad</label>
-  <input
-    name="ciudad"
-    value={form.ciudad}
-    placeholder="Ej: Morón"
-    onChange={handleChange}
-    style={input}
-  />
-</div>
+          <div>
+            <label style={label}>Ciudad</label>
+            <input
+              name="ciudad"
+              value={form.ciudad}
+              placeholder="Ej: Morón"
+              onChange={handleChange}
+              style={input}
+            />
+          </div>
 
           {/* Imagen PRO */}
           <div>
@@ -283,22 +272,20 @@ export default function NuevaMascota() {
                   <div style={{ fontWeight: 600 }}>
                     Click para subir una imagen
                   </div>
-                  <div style={uploadHint}>
-                    JPG, PNG o WEBP · Máx 5MB
-                  </div>
+                  <div style={uploadHint}>JPG, PNG o WEBP · Máx 5MB</div>
                 </>
               ) : (
                 <img
-  src={preview}
-  alt="preview"
-  style={{
-    width: '100%',
-    height: 320,
-    objectFit: 'contain',
-    borderRadius: 12,
-    background: '#f3f4f6'
-  }}
-/>
+                  src={preview}
+                  alt="preview"
+                  style={{
+                    width: '100%',
+                    height: 320,
+                    objectFit: 'contain',
+                    borderRadius: 12,
+                    background: '#f3f4f6',
+                  }}
+                />
               )}
 
               <input
@@ -316,12 +303,11 @@ export default function NuevaMascota() {
             style={{
               ...button,
               opacity: loading ? 0.7 : 1,
-              cursor: loading ? 'not-allowed' : 'pointer'
+              cursor: loading ? 'not-allowed' : 'pointer',
             }}
           >
             {loading ? 'Guardando...' : 'Guardar mascota'}
           </button>
-
         </form>
       </div>
     </div>
@@ -336,7 +322,7 @@ const container = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  padding: 20
+  padding: 20,
 }
 
 const card = {
@@ -345,23 +331,23 @@ const card = {
   background: '#fff',
   borderRadius: 20,
   padding: 30,
-  boxShadow: '0 25px 60px rgba(0,0,0,0.08)'
+  boxShadow: '0 25px 60px rgba(0,0,0,0.08)',
 }
 
 const title = {
   fontSize: 30,
-  marginBottom: 6
+  marginBottom: 6,
 }
 
 const subtitle = {
   color: '#6b7280',
-  marginBottom: 20
+  marginBottom: 20,
 }
 
 const formStyle = {
   display: 'flex',
   flexDirection: 'column',
-  gap: 24
+  gap: 24,
 }
 
 const label = {
@@ -369,7 +355,7 @@ const label = {
   fontSize: 14,
   fontWeight: 600,
   marginBottom: 8,
-  color: '#374151'
+  color: '#374151',
 }
 
 const input = {
@@ -378,20 +364,19 @@ const input = {
   borderRadius: 12,
   border: '1px solid #e5e7eb',
   fontSize: 14,
-  outline: 'none'
+  outline: 'none',
 }
 
 const row = {
   display: 'flex',
   gap: 20,
-  flexWrap: 'wrap'
+  flexWrap: 'wrap',
 }
 
 const column = {
   flex: 1,
-  minWidth: 260
+  minWidth: 260,
 }
-
 
 const uploadBox = {
   width: '100%',
@@ -405,14 +390,13 @@ const uploadBox = {
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  textAlign: 'center'
+  textAlign: 'center',
 }
-
 
 const uploadHint = {
   fontSize: 13,
   color: '#6b7280',
-  marginTop: 6
+  marginTop: 6,
 }
 
 const button = {
@@ -423,7 +407,7 @@ const button = {
   fontSize: 16,
   fontWeight: 600,
   border: 'none',
-  borderRadius: 14
+  borderRadius: 14,
 }
 
 const checkboxLabel = {
@@ -431,7 +415,5 @@ const checkboxLabel = {
   gap: 10,
   alignItems: 'center',
   fontWeight: 600,
-  marginTop: 10
+  marginTop: 10,
 }
-
-

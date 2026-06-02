@@ -1,36 +1,30 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
-import {
-  esFavorito,
-  toggleFavorito
-} from '../../lib/favoritos'
+import { esFavorito, toggleFavorito } from '../../lib/favoritos'
 
-export default function MascotasPage() {
+function MascotasContent() {
   const [mascotas, setMascotas] = useState([])
   const [loading, setLoading] = useState(true)
   const searchParams = useSearchParams()
-  const estadoFiltro =
-  searchParams.get('estado') || ''
+  const estadoFiltro = searchParams.get('estado') || ''
   const router = useRouter()
   const [busqueda, setBusqueda] = useState('')
   const [favoritos, setFavoritos] = useState([])
-
 
   useEffect(() => {
     fetchMascotas()
   }, [estadoFiltro])
 
   useEffect(() => {
-  const favoritosGuardados =
-    JSON.parse(localStorage.getItem('favoritos')) || []
+    const favoritosGuardados =
+      JSON.parse(localStorage.getItem('favoritos')) || []
 
-  setFavoritos(favoritosGuardados)
-}, [])
-
+    setFavoritos(favoritosGuardados)
+  }, [])
 
   async function fetchMascotas() {
     setLoading(true)
@@ -58,19 +52,13 @@ export default function MascotasPage() {
     <div style={page}>
       <h1 style={title}>Mascotas</h1>
 
-      <p style={subtitle}>
-        Mascotas disponibles en refugios de todo el país
-      </p>
+      <p style={subtitle}>Mascotas disponibles en refugios de todo el país</p>
 
       {/* FILTRO */}
       <div style={filterBox}>
         <select
           value={estadoFiltro}
-          onChange={(e) =>
-  router.push(
-    `/mascotas?estado=${e.target.value}`
-  )
-}
+          onChange={(e) => router.push(`/mascotas?estado=${e.target.value}`)}
           style={select}
         >
           <option value="">Todas</option>
@@ -81,15 +69,15 @@ export default function MascotasPage() {
       </div>
 
       {/* BUSCADOR */}
-<div style={searchBox}>
-  <input
-    type="text"
-    placeholder="Buscar por tipo, raza o ciudad..."
-    value={busqueda}
-    onChange={(e) => setBusqueda(e.target.value)}
-    style={searchInput}
-  />
-</div>
+      <div style={searchBox}>
+        <input
+          type="text"
+          placeholder="Buscar por tipo, raza o ciudad..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          style={searchInput}
+        />
+      </div>
 
       {/* CONTENIDO */}
       {loading ? (
@@ -99,121 +87,80 @@ export default function MascotasPage() {
       ) : (
         <div style={grid}>
           {mascotas
-  .filter((m) => {
-    const texto = busqueda.toLowerCase()
+            .filter((m) => {
+              const texto = busqueda.toLowerCase()
 
-    return (
-      m.tipo?.toLowerCase().includes(texto) ||
-      m.raza?.toLowerCase().includes(texto) ||
-      m.ciudad?.toLowerCase().includes(texto)
-    )
-  })
-  .map((m) => (
-    
-    <div
-    key={m.id}
-    style={{
-      ...card,
-      
-      border: m.urgent
-      ? '3px solid #ef4444'
-      : 'none',
-      
-      animation: m.urgent
-      ? 'pulse 2s infinite'
-      : 'none'
-    }}
-    onClick={() => router.push(`/mascotas/${m.id}`)}
->
-        {/* IMAGEN */}
-        <div style={imageWrapper}>
-          {m.imagen_url ? (
-            <img
-              src={m.imagen_url}
-              alt={m.tipo}
-              style={image}
-            />
-          ) : (
-            <div style={noImage}>
-              Sin foto
-            </div>
-          )}
-        </div>
+              return (
+                m.tipo?.toLowerCase().includes(texto) ||
+                m.raza?.toLowerCase().includes(texto) ||
+                m.ciudad?.toLowerCase().includes(texto)
+              )
+            })
+            .map((m) => (
+              <div
+                key={m.id}
+                style={{
+                  ...card,
 
-        {/* BODY */}
-        <div style={cardBody}>
+                  border: m.urgent ? '3px solid #ef4444' : 'none',
 
-          <span style={badge(m.estado)}>
-            {labelEstado(m.estado)}
-          </span>
+                  animation: m.urgent ? 'pulse 2s infinite' : 'none',
+                }}
+                onClick={() => router.push(`/mascotas/${m.id}`)}
+              >
+                {/* IMAGEN */}
+                <div style={imageWrapper}>
+                  {m.imagen_url ? (
+                    <img src={m.imagen_url} alt={m.tipo} style={image} />
+                  ) : (
+                    <div style={noImage}>Sin foto</div>
+                  )}
+                </div>
 
-          {m.urgent && (
-  <span style={urgentBadge}>
-    🚨 URGENTE
-  </span>
-)}
+                {/* BODY */}
+                <div style={cardBody}>
+                  <span style={badge(m.estado)}>{labelEstado(m.estado)}</span>
 
-          <h3 style={cardTitle}>
-            {m.tipo} {m.raza && `· ${m.raza}`}
-          </h3>
+                  {m.urgent && <span style={urgentBadge}>🚨 URGENTE</span>}
 
-          <p style={info}>
-            Edad: {m.edad || 'No especificada'}
-          </p>
+                  <h3 style={cardTitle}>
+                    {m.tipo} {m.raza && `· ${m.raza}`}
+                  </h3>
 
-          <p style={info}>
-            Tamaño: {m.tamano || 'No especificado'}
-          </p>
+                  <p style={info}>Edad: {m.edad || 'No especificada'}</p>
 
-          {m.ciudad && (
-            <p style={info}>
-              📍 {m.ciudad}
-            </p>
-          )}
+                  <p style={info}>Tamaño: {m.tamano || 'No especificado'}</p>
 
-          {m.descripcion && (
-            <p style={desc}>
-              {m.descripcion}
-            </p>
-          )}
-            
-            <div style={{ flex: 1 }} />
-          <div style={actions}>
+                  {m.ciudad && <p style={info}>📍 {m.ciudad}</p>}
 
-  <button style={button}>
-    Ver mascota
-  </button>
+                  {m.descripcion && <p style={desc}>{m.descripcion}</p>}
 
-  <button
-  onClick={(e) => {
-    e.stopPropagation()
+                  <div style={{ flex: 1 }} />
+                  <div style={actions}>
+                    <button style={button}>Ver mascota</button>
 
-    const nuevos = toggleFavorito(m.id)
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
 
-    setFavoritos(nuevos)
-  }}
-  style={favButton}
-  type="button"
->
-  {favoritos.includes(m.id)
-    ? '❤️'
-    : '🤍'}
-</button>
-</div>
+                        const nuevos = toggleFavorito(m.id)
 
-        </div>
-      </div>
-    
-))}
+                        setFavoritos(nuevos)
+                      }}
+                      style={favButton}
+                      type="button"
+                    >
+                      {favoritos.includes(m.id) ? '❤️' : '🤍'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
         </div>
       )}
-      
     </div>
-    
-    
   )
 }
-
 
 /* HELPERS */
 
@@ -230,25 +177,25 @@ function labelEstado(estado) {
 const page = {
   minHeight: '100vh',
   padding: '24px 16px',
-  background: '#f3f4f6'
+  background: '#f3f4f6',
 }
 
 const title = {
   fontSize: 28,
-  marginBottom: 4
+  marginBottom: 4,
 }
 
 const subtitle = {
   color: '#6b7280',
-  marginBottom: 24
+  marginBottom: 24,
 }
 
 const filterBox = {
-  marginBottom: 24
+  marginBottom: 24,
 }
 
 const searchBox = {
-  marginBottom: 24
+  marginBottom: 24,
 }
 
 const searchInput = {
@@ -257,21 +204,21 @@ const searchInput = {
   padding: 12,
   borderRadius: 10,
   border: '1px solid #d1d5db',
-  fontSize: 14
+  fontSize: 14,
 }
 
 const select = {
   padding: 10,
   borderRadius: 8,
   border: '1px solid #d1d5db',
-  fontSize: 14
+  fontSize: 14,
 }
 
 const grid = {
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
   gap: 24,
-  marginTop: 30
+  marginTop: 30,
 }
 
 const card = {
@@ -284,7 +231,7 @@ const card = {
   display: 'flex',
   flexDirection: 'column',
 
-  minHeight: 560
+  minHeight: 560,
 }
 
 const imageWrapper = {
@@ -293,18 +240,18 @@ const imageWrapper = {
   background: '#ffffff',
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center'
+  justifyContent: 'center',
 }
 
 const image = {
   width: '100%',
   height: 260,
   objectFit: 'contain',
-  background: '#fff'
+  background: '#fff',
 }
 
 const noImage = {
-  color: '#6b7280'
+  color: '#6b7280',
 }
 
 const cardBody = {
@@ -313,23 +260,23 @@ const cardBody = {
   display: 'flex',
   flexDirection: 'column',
 
-  flex: 1
+  flex: 1,
 }
 
 const cardTitle = {
   fontSize: 16,
-  fontWeight: 600
+  fontWeight: 600,
 }
 
 const info = {
   fontSize: 14,
-  color: '#374151'
+  color: '#374151',
 }
 
 const desc = {
   fontSize: 13,
   color: '#6b7280',
-  marginTop: 6
+  marginTop: 6,
 }
 
 const badge = (estado) => ({
@@ -344,19 +291,18 @@ const badge = (estado) => ({
     estado === 'adopcion'
       ? '#dcfce7'
       : estado === 'perdida'
-      ? '#fee2e2'
-      : '#dbeafe',
+        ? '#fee2e2'
+        : '#dbeafe',
 
   color:
     estado === 'adopcion'
       ? '#166534'
       : estado === 'perdida'
-      ? '#991b1b'
-      : '#1e40af'
+        ? '#991b1b'
+        : '#1e40af',
 })
 
 const button = {
-  
   marginTop: 14,
   width: '100%',
   padding: 12,
@@ -365,19 +311,19 @@ const button = {
   background: '#4f46e5',
   color: '#fff',
   fontWeight: 600,
-  cursor: 'pointer'
+  cursor: 'pointer',
 }
 
 const container = {
   padding: 20,
   maxWidth: 1400,
-  margin: '0 auto'
+  margin: '0 auto',
 }
 
 const actions = {
   display: 'flex',
   gap: 10,
-  marginTop: 14
+  marginTop: 14,
 }
 
 const favButton = {
@@ -386,7 +332,7 @@ const favButton = {
   borderRadius: 10,
   background: '#f3f4f6',
   cursor: 'pointer',
-  fontSize: 22
+  fontSize: 22,
 }
 
 const urgentBadge = {
@@ -397,5 +343,13 @@ const urgentBadge = {
   fontSize: 12,
   fontWeight: 700,
   alignSelf: 'flex-start',
-  marginTop: 8
+  marginTop: 8,
+}
+
+export default function MascotasPage() {
+  return (
+    <Suspense fallback={<p>Cargando...</p>}>
+      <MascotasContent />
+    </Suspense>
+  )
 }

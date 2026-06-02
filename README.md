@@ -7,7 +7,7 @@ Una aplicación web simple para que rescatistas encuentren refugios con disponib
 ✅ **Listado de refugios** - Visualiza refugios con capacidad disponible  
 ✅ **Información en tiempo real** - Datos sincronizados desde Supabase  
 ✅ **Interfaz simple** - Diseño limpio y responsive  
-✅ **Seguro** - Solo lectura pública, sin ediciones desde frontend  
+✅ **Seguro** - Solo lectura pública, sin ediciones desde frontend
 
 ## 🛠 Tech Stack
 
@@ -100,45 +100,48 @@ refugios-mascotas/
 
 ### Tabla: `shelters` (Refugios)
 
-| Campo | Tipo | Descripción |
-|-------|------|-------------|
-| id | BIGINT | ID único |
-| nombre | VARCHAR(255) | Nombre del refugio |
-| ciudad | VARCHAR(100) | Ciudad donde está ubicado |
-| telefono | VARCHAR(20) | Teléfono de contacto |
-| capacidad_total | INT | Total de mascotas que puede alojar |
-| capacidad_disponible | INT | **Lugares disponibles (dato clave)** |
-| created_at | TIMESTAMP | Fecha de creación |
-| updated_at | TIMESTAMP | Última actualización |
+| Campo                | Tipo         | Descripción                          |
+| -------------------- | ------------ | ------------------------------------ |
+| id                   | BIGINT       | ID único                             |
+| nombre               | VARCHAR(255) | Nombre del refugio                   |
+| ciudad               | VARCHAR(100) | Ciudad donde está ubicado            |
+| telefono             | VARCHAR(20)  | Teléfono de contacto                 |
+| capacidad_total      | INT          | Total de mascotas que puede alojar   |
+| capacidad_disponible | INT          | **Lugares disponibles (dato clave)** |
+| created_at           | TIMESTAMP    | Fecha de creación                    |
+| updated_at           | TIMESTAMP    | Última actualización                 |
 
 ### Tabla: `animals` (Mascotas)
 
-| Campo | Tipo | Descripción |
-|-------|------|-------------|
-| id | BIGINT | ID único |
-| nombre | VARCHAR(255) | Nombre de la mascota |
-| tipo | VARCHAR(50) | Tipo: 'perro', 'gato', 'otro' |
-| raza | VARCHAR(100) | Raza |
-| edad_aproximada | VARCHAR(50) | Edad estimada |
-| descripcion | TEXT | Descripción del animal |
-| shelter_id | BIGINT | ID del refugio asociado |
-| estado | VARCHAR(50) | Estado: 'disponible', 'adoptado', 'en_evaluacion' |
-| created_at | TIMESTAMP | Fecha de creación |
-| updated_at | TIMESTAMP | Última actualización |
+| Campo           | Tipo         | Descripción                                       |
+| --------------- | ------------ | ------------------------------------------------- |
+| id              | BIGINT       | ID único                                          |
+| nombre          | VARCHAR(255) | Nombre de la mascota                              |
+| tipo            | VARCHAR(50)  | Tipo: 'perro', 'gato', 'otro'                     |
+| raza            | VARCHAR(100) | Raza                                              |
+| edad_aproximada | VARCHAR(50)  | Edad estimada                                     |
+| descripcion     | TEXT         | Descripción del animal                            |
+| shelter_id      | BIGINT       | ID del refugio asociado                           |
+| estado          | VARCHAR(50)  | Estado: 'disponible', 'adoptado', 'en_evaluacion' |
+| created_at      | TIMESTAMP    | Fecha de creación                                 |
+| updated_at      | TIMESTAMP    | Última actualización                              |
 
 ## 🔒 Seguridad - Row Level Security (RLS)
 
 Todas las tablas tienen RLS activado:
 
 ✅ **Permitido**:
+
 - Lectura pública de refugios y mascotas
 - La app lee datos en tiempo real
 
 ❌ **Bloqueado**:
+
 - INSERT, UPDATE, DELETE desde frontend
 - Solo administradores de Supabase pueden modificar datos
 
 Los rescatistas NO pueden:
+
 - Eliminar refugios o mascotas
 - Editar información desde la web
 - Crear registros fraudulentos

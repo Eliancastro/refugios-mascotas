@@ -1,107 +1,96 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase';
+import { useEffect, useState } from 'react'
+import { supabase } from '../../lib/supabase'
 
 export default function AdminPage() {
-  const [pending, setPending] = useState([]);
-  const [approved, setApproved] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [authorized, setAuthorized] = useState(false);
-  const [message, setMessage] = useState(null);
+  const [pending, setPending] = useState([])
+  const [approved, setApproved] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [authorized, setAuthorized] = useState(false)
+  const [message, setMessage] = useState(null)
 
   useEffect(() => {
-    const pass = prompt('Contraseña de administrador');
+    const pass = prompt('Contraseña de administrador')
     if (pass === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
-      setAuthorized(true);
+      setAuthorized(true)
     } else {
-      alert('Acceso denegado');
+      alert('Acceso denegado')
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
-    if (authorized) fetchShelters();
-  }, [authorized]);
+    if (authorized) fetchShelters()
+  }, [authorized])
 
   if (!authorized) {
     return (
       <main className="min-h-screen flex items-center justify-center">
         <p className="text-gray-500">Acceso restringido</p>
       </main>
-    );
+    )
   }
 
   const fetchShelters = async () => {
-    setLoading(true);
+    setLoading(true)
 
     const { data, error } = await supabase
       .from('shelters')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
 
     if (!error && data) {
-      setPending(data.filter((s) => !s.approved));
-      setApproved(data.filter((s) => s.approved));
+      setPending(data.filter((s) => !s.approved))
+      setApproved(data.filter((s) => s.approved))
     }
 
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
   const approveShelter = async (id) => {
-    await supabase
-      .from('shelters')
-      .update({ approved: true })
-      .eq('id', id);
+    await supabase.from('shelters').update({ approved: true }).eq('id', id)
 
-    setMessage('✅ Refugio aprobado');
-    fetchShelters();
-  };
+    setMessage('✅ Refugio aprobado')
+    fetchShelters()
+  }
 
   const rejectShelter = async (id) => {
-    const confirmDelete = confirm(
-      '¿Seguro que querés rechazar este refugio?'
-    );
+    const confirmDelete = confirm('¿Seguro que querés rechazar este refugio?')
 
-    if (!confirmDelete) return;
+    if (!confirmDelete) return
 
-    await supabase
-      .from('shelters')
-      .delete()
-      .eq('id', id);
+    await supabase.from('shelters').delete().eq('id', id)
 
-    fetchShelters();
-  };
+    fetchShelters()
+  }
 
   const verifyShelter = async (id) => {
+    await supabase
+      .from('shelters')
+      .update({
+        verified: true,
+      })
+      .eq('id', id)
 
-  await supabase
-    .from('shelters')
-    .update({
-      verified: true
-    })
-    .eq('id', id)
+    setMessage('✅ Refugio verificado')
 
-  setMessage('✅ Refugio verificado')
-
-  fetchShelters()
-}
+    fetchShelters()
+  }
 
   // ⭐ CAMBIAR DISPONIBILIDAD (PRO)
   const toggleCapacity = async (id, current) => {
     await supabase
       .from('shelters')
       .update({ has_capacity: !current })
-      .eq('id', id);
+      .eq('id', id)
 
-    fetchShelters();
-  };
+    fetchShelters()
+  }
 
   return (
     <main className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">
-          🛠 Panel de Moderación
-        </h1>
+        <h1 className="text-3xl font-bold mb-6">🛠 Panel de Moderación</h1>
 
         {message && (
           <div className="mb-4 bg-green-100 text-green-800 p-3 rounded">
@@ -118,9 +107,7 @@ export default function AdminPage() {
           </h2>
 
           {pending.length === 0 && (
-            <p className="text-gray-500">
-              No hay refugios pendientes
-            </p>
+            <p className="text-gray-500">No hay refugios pendientes</p>
           )}
 
           <div className="grid gap-4">
@@ -130,7 +117,9 @@ export default function AdminPage() {
                 className="bg-white p-4 rounded shadow border-l-4 border-yellow-400"
               >
                 <h3 className="text-xl font-bold">{shelter.name}</h3>
-                <p>📍 {shelter.city}, {shelter.province}</p>
+                <p>
+                  📍 {shelter.city}, {shelter.province}
+                </p>
                 <p>📌 {shelter.address}</p>
                 <p>📞 {shelter.phone}</p>
 
@@ -162,15 +151,11 @@ export default function AdminPage() {
 
         {/* REPORTES */}
 
-<section className="mb-10">
+        <section className="mb-10">
+          <h2 className="text-2xl font-bold mb-4 text-red-700">🚨 Reportes</h2>
 
-  <h2 className="text-2xl font-bold mb-4 text-red-700">
-    🚨 Reportes
-  </h2>
-
-  <ReportsSection />
-
-</section>
+          <ReportsSection />
+        </section>
 
         {/* APROBADOS */}
         <section>
@@ -179,9 +164,7 @@ export default function AdminPage() {
           </h2>
 
           {approved.length === 0 && (
-            <p className="text-gray-500">
-              Aún no hay refugios aprobados
-            </p>
+            <p className="text-gray-500">Aún no hay refugios aprobados</p>
           )}
 
           <div className="grid gap-4">
@@ -191,7 +174,9 @@ export default function AdminPage() {
                 className="bg-white p-4 rounded shadow border-l-4 border-green-500"
               >
                 <h3 className="text-xl font-bold">{shelter.name}</h3>
-                <p>📍 {shelter.city}, {shelter.province}</p>
+                <p>
+                  📍 {shelter.city}, {shelter.province}
+                </p>
                 <p>📌 {shelter.address}</p>
                 <p>📞 {shelter.phone}</p>
 
@@ -201,20 +186,13 @@ export default function AdminPage() {
                     : '🔴 Sin lugar'}
                 </p>
 
-
                 <div className="mt-2 space-y-1">
+                  <p className="text-sm text-gray-500">Aprobado ✔</p>
 
-  <p className="text-sm text-gray-500">
-    Aprobado ✔
-  </p>
-
-  <p className="text-sm">
-    {shelter.verified
-      ? '✅ Verificado'
-      : '⚠️ No verificado'}
-  </p>
-
-</div>
+                  <p className="text-sm">
+                    {shelter.verified ? '✅ Verificado' : '⚠️ No verificado'}
+                  </p>
+                </div>
 
                 {/* BOTON PRO */}
                 <button
@@ -228,24 +206,23 @@ export default function AdminPage() {
                     : '🟢 Marcar con lugar'}
                 </button>
                 {!shelter.verified && (
-  <button
-    onClick={() => verifyShelter(shelter.id)}
-    className="mt-3 bg-indigo-600 text-white px-4 py-2 rounded font-bold hover:bg-indigo-700"
-  >
-    ✅ Verificar refugio
-  </button>
-)}
+                  <button
+                    onClick={() => verifyShelter(shelter.id)}
+                    className="mt-3 bg-indigo-600 text-white px-4 py-2 rounded font-bold hover:bg-indigo-700"
+                  >
+                    ✅ Verificar refugio
+                  </button>
+                )}
               </div>
             ))}
           </div>
         </section>
       </div>
     </main>
-  );
+  )
 }
 
 function ReportsSection() {
-
   const [reports, setReports] = useState([])
 
   useEffect(() => {
@@ -253,12 +230,11 @@ function ReportsSection() {
   }, [])
 
   async function fetchReports() {
-
     const { data } = await supabase
       .from('reports')
       .select('*')
       .order('created_at', {
-        ascending: false
+        ascending: false,
       })
 
     if (data) {
@@ -267,36 +243,25 @@ function ReportsSection() {
   }
 
   if (reports.length === 0) {
-    return (
-      <p className="text-gray-500">
-        No hay reportes
-      </p>
-    )
+    return <p className="text-gray-500">No hay reportes</p>
   }
 
   return (
     <div className="grid gap-4">
-
       {reports.map((report) => (
-
         <div
           key={report.id}
           className="bg-white p-4 rounded shadow border-l-4 border-red-500"
         >
-
           <p>
-            <strong>Tipo:</strong>{' '}
-            {report.target_type}
+            <strong>Tipo:</strong> {report.target_type}
           </p>
 
           <p className="mt-2">
-            <strong>Motivo:</strong>{' '}
-            {report.reason}
+            <strong>Motivo:</strong> {report.reason}
           </p>
-
         </div>
       ))}
-
     </div>
   )
 }

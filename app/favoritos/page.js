@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { supabase } from '../../lib/supabase'
 
 export default function FavoritosPage() {
-
   const [mascotas, setMascotas] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -14,9 +13,7 @@ export default function FavoritosPage() {
   }, [])
 
   async function fetchFavoritos() {
-
-    const favoritos =
-      JSON.parse(localStorage.getItem('favoritos')) || []
+    const favoritos = JSON.parse(localStorage.getItem('favoritos')) || []
 
     if (favoritos.length === 0) {
       setMascotas([])
@@ -37,27 +34,16 @@ export default function FavoritosPage() {
   }
 
   async function removeFavorite(mascotaId) {
+    await supabase.from('favoritos').delete().eq('mascota_id', mascotaId)
 
-  await supabase
-    .from('favoritos')
-    .delete()
-    .eq('mascota_id', mascotaId)
-
-  setFavoritos((prev) =>
-    prev.filter((m) => m.id !== mascotaId)
-  )
-}
+    setFavoritos((prev) => prev.filter((m) => m.id !== mascotaId))
+  }
 
   return (
     <div style={page}>
+      <h1 style={title}>❤️ Mis favoritos</h1>
 
-      <h1 style={title}>
-        ❤️ Mis favoritos
-      </h1>
-
-      <p style={subtitle}>
-        Mascotas que guardaste
-      </p>
+      <p style={subtitle}>Mascotas que guardaste</p>
 
       {loading ? (
         <p>Cargando...</p>
@@ -71,56 +57,39 @@ export default function FavoritosPage() {
               href={`/mascotas/${m.id}`}
               style={{
                 textDecoration: 'none',
-                color: 'inherit'
+                color: 'inherit',
               }}
             >
               <div style={card}>
-
                 <div style={imageWrapper}>
                   {m.imagen_url ? (
-                    <img
-                      src={m.imagen_url}
-                      alt={m.tipo}
-                      style={image}
-                    />
+                    <img src={m.imagen_url} alt={m.tipo} style={image} />
                   ) : (
-                    <div style={noImage}>
-                      Sin foto
-                    </div>
+                    <div style={noImage}>Sin foto</div>
                   )}
                 </div>
 
                 <div style={cardBody}>
-
-                  <span style={badge(m.estado)}>
-                    {labelEstado(m.estado)}
-                  </span>
+                  <span style={badge(m.estado)}>{labelEstado(m.estado)}</span>
 
                   <h3 style={cardTitle}>
                     {m.tipo} {m.raza && `· ${m.raza}`}
                   </h3>
 
-                  {m.ciudad && (
-                    <p style={info}>
-                      📍 {m.ciudad}
-                    </p>
-                  )}
+                  {m.ciudad && <p style={info}>📍 {m.ciudad}</p>}
 
                   <button
-  onClick={() => removeFavorite(m.id)}
-  style={removeButton}
->
-  💔 Quitar favorito
-</button>
-
+                    onClick={() => removeFavorite(m.id)}
+                    style={removeButton}
+                  >
+                    💔 Quitar favorito
+                  </button>
                 </div>
-
               </div>
             </Link>
           ))}
         </div>
       )}
-
     </div>
   )
 }
@@ -140,66 +109,66 @@ function labelEstado(estado) {
 const page = {
   minHeight: '100vh',
   padding: 32,
-  background: '#f3f4f6'
+  background: '#f3f4f6',
 }
 
 const title = {
   fontSize: 28,
-  marginBottom: 4
+  marginBottom: 4,
 }
 
 const subtitle = {
   color: '#6b7280',
-  marginBottom: 24
+  marginBottom: 24,
 }
 
 const grid = {
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-  gap: 20
+  gap: 20,
 }
 
 const card = {
   background: '#fff',
   borderRadius: 16,
   overflow: 'hidden',
-  boxShadow: '0 10px 25px rgba(0,0,0,0.08)'
+  boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
 }
 
 const imageWrapper = {
   width: '100%',
   height: 240,
-  background: '#fff'
+  background: '#fff',
 }
 
 const image = {
   width: '100%',
   height: 260,
   objectFit: 'contain',
-  background: '#fff'
+  background: '#fff',
 }
 const noImage = {
   height: '100%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  color: '#6b7280'
+  color: '#6b7280',
 }
 
 const cardBody = {
-  padding: 16
+  padding: 16,
 }
 
 const cardTitle = {
   fontSize: 16,
   fontWeight: 600,
-  marginTop: 10
+  marginTop: 10,
 }
 
 const info = {
   fontSize: 14,
   color: '#374151',
-  marginTop: 6
+  marginTop: 6,
 }
 
 const removeButton = {
@@ -211,7 +180,7 @@ const removeButton = {
   background: '#ef4444',
   color: '#fff',
   fontWeight: 600,
-  cursor: 'pointer'
+  cursor: 'pointer',
 }
 
 const badge = (estado) => ({
@@ -225,13 +194,13 @@ const badge = (estado) => ({
     estado === 'adopcion'
       ? '#dcfce7'
       : estado === 'perdida'
-      ? '#fee2e2'
-      : '#dbeafe',
+        ? '#fee2e2'
+        : '#dbeafe',
 
   color:
     estado === 'adopcion'
       ? '#166534'
       : estado === 'perdida'
-      ? '#991b1b'
-      : '#1e40af'
+        ? '#991b1b'
+        : '#1e40af',
 })

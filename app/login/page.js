@@ -5,7 +5,6 @@ import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
-
   const router = useRouter()
 
   const [email, setEmail] = useState('')
@@ -20,7 +19,7 @@ export default function LoginPage() {
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
-      password
+      password,
     })
 
     setLoading(false)
@@ -37,25 +36,15 @@ export default function LoginPage() {
 
   return (
     <div style={container}>
-
       <div style={card}>
+        <h1 style={title}>Iniciar sesión</h1>
 
-        <h1 style={title}>
-          Iniciar sesión
-        </h1>
-
-        <form
-          onSubmit={handleLogin}
-          style={form}
-        >
-
+        <form onSubmit={handleLogin} style={form}>
           <input
             type="email"
             placeholder="Email"
             value={email}
-            onChange={(e) =>
-              setEmail(e.target.value)
-            }
+            onChange={(e) => setEmail(e.target.value)}
             style={input}
             required
           />
@@ -64,27 +53,16 @@ export default function LoginPage() {
             type="password"
             placeholder="Contraseña"
             value={password}
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
+            onChange={(e) => setPassword(e.target.value)}
             style={input}
             required
           />
 
-          <button
-            type="submit"
-            style={button}
-            disabled={loading}
-          >
-            {loading
-              ? 'Ingresando...'
-              : 'Ingresar'}
+          <button type="submit" style={button} disabled={loading}>
+            {loading ? 'Ingresando...' : 'Ingresar'}
           </button>
-
         </form>
-
       </div>
-
     </div>
   )
 }
@@ -96,7 +74,7 @@ const container = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  background: '#f3f4f6'
+  background: '#f3f4f6',
 }
 
 const card = {
@@ -105,25 +83,25 @@ const card = {
   background: '#fff',
   padding: 30,
   borderRadius: 20,
-  boxShadow: '0 10px 30px rgba(0,0,0,0.08)'
+  boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
 }
 
 const title = {
   fontSize: 28,
-  marginBottom: 20
+  marginBottom: 20,
 }
 
 const form = {
   display: 'flex',
   flexDirection: 'column',
-  gap: 16
+  gap: 16,
 }
 
 const input = {
   padding: 14,
   borderRadius: 10,
   border: '1px solid #d1d5db',
-  fontSize: 14
+  fontSize: 14,
 }
 
 const button = {
@@ -133,5 +111,5 @@ const button = {
   background: '#4f46e5',
   color: '#fff',
   fontWeight: 600,
-  cursor: 'pointer'
+  cursor: 'pointer',
 }
