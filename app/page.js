@@ -10,6 +10,7 @@ export default function Home() {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('');
   const [urgent, setUrgent] = useState(false);
+  const [userLocation, setUserLocation] = useState(null);
 
   const fetchShelters = async () => {
     try {
@@ -17,7 +18,21 @@ export default function Home() {
 
       const { data, error } = await supabase
         .from('shelters')
-        .select('id, name, city, province, address, phone, has_capacity, approved')
+        .select(`
+  id,
+  name,
+  city,
+  province,
+  address,
+  phone,
+  has_capacity,
+  approved,
+  lat,
+  lng,
+  alias,
+  cvu,
+  mp_link
+`)
         .eq('has_capacity', true)
         .eq('approved', true);
 
@@ -55,6 +70,23 @@ export default function Home() {
     };
   }, []);
 
+  const getLocation = () => {
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+
+      setUserLocation({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      })
+
+    },
+    () => {
+      alert('No se pudo obtener tu ubicación')
+    }
+  )
+}
+
   const filteredShelters = shelters
     .filter((shelter) => {
       const search = filter.toLowerCase();
@@ -66,6 +98,31 @@ export default function Home() {
       );
     })
     .sort((a, b) => {
+
+      if (
+  userLocation &&
+  a.lat &&
+  a.lng &&
+  b.lat &&
+  b.lng
+) {
+
+  const distA = getDistance(
+    userLocation.lat,
+    userLocation.lng,
+    a.lat,
+    a.lng
+  )
+
+  const distB = getDistance(
+    userLocation.lat,
+    userLocation.lng,
+    b.lat,
+    b.lng
+  )
+
+  return distA - distB
+}
       const search = filter.toLowerCase();
 
       const aCity = shelterScore(a, search);
@@ -88,52 +145,147 @@ export default function Home() {
     return 0;
   }
 
+  function getDistance(lat1, lon1, lat2, lon2) {
+
+  const R = 6371
+
+  const dLat =
+    (lat2 - lat1) * Math.PI / 180
+
+  const dLon =
+    (lon2 - lon1) * Math.PI / 180
+
+  const a =
+    Math.sin(dLat / 2) *
+    Math.sin(dLat / 2) +
+
+    Math.cos(lat1 * Math.PI / 180) *
+    Math.cos(lat2 * Math.PI / 180) *
+
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2)
+
+  const c =
+    2 * Math.atan2(
+      Math.sqrt(a),
+      Math.sqrt(1 - a)
+    )
+
+  return R * c
+}
+
   return (
     <main className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 p-6">
       <div className="max-w-4xl mx-auto">
 
-        {/* HEADER */}
-        <div className="mb-12 text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            🐾 Refugios de Mascotas
-          </h1>
+        {/* HERO */}
+<div className="mb-12 text-center">
 
-          <div className="mt-4">
-            <a
-              href="/registrar-refugio"
-              className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-indigo-700 transition"
-            >
-              ➕ ¿Sos refugio? Sumate
-            </a>
-          </div>
+  <h1 className="text-5xl font-extrabold text-gray-900 mb-4">
+    🐾 Refugios Mascotas
+  </h1>
 
-          <p className="text-xl text-gray-600">
-            Refugios que pueden recibir mascotas rescatadas ahora
-          </p>
+  <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+    Encontrá mascotas en adopción, publicá mascotas perdidas,
+    ayudá a reunir familias y conectate con refugios de todo el país.
+  </p>
 
-          <div className="mt-6">
-            <input
-              type="text"
-              placeholder="Filtrar por ciudad o provincia"
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+  {/* BOTONES */}
+  <div className="mt-8 flex flex-wrap justify-center gap-4">
 
-            <div className="mt-4 flex justify-center">
-              <button
-                onClick={() => setUrgent(!urgent)}
-                className={`px-6 py-3 rounded-full font-bold transition ${
-                  urgent
-                    ? 'bg-red-600 text-white animate-pulse'
-                    : 'bg-gray-200 text-gray-800'
-                }`}
-              >
-                🚨 {urgent ? 'URGENCIA ACTIVADA' : 'ACTIVAR URGENCIA'}
-              </button>
-            </div>
-          </div>
-        </div>
+    <a
+      href="/mascotas?estado=adopcion"
+      className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-4 rounded-xl font-bold transition"
+    >
+      🐶 Adoptar
+    </a>
+
+    <a
+      href="/mascotas?estado=perdida"
+      className="bg-red-500 hover:bg-red-600 text-white px-6 py-4 rounded-xl font-bold transition"
+    >
+      🔍 Perdidas
+    </a>
+
+    <a
+      href="/mascotas?estado=encontrada"
+      className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-4 rounded-xl font-bold transition"
+    >
+      🏠 Encontradas
+    </a>
+
+    <a
+      href="/mascotas/nueva"
+      className="bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-xl font-bold transition"
+    >
+      ➕ Publicar mascota
+    </a>
+
+    <a
+  href="/registrar-refugio"
+  className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-2xl font-bold text-xl shadow-lg transition"
+>
+  🏠 ¿Sos refugio? Sumate
+</a>
+
+  </div>
+
+</div>
+
+{/* REFUGIOS */}
+<div className="mb-10">
+
+  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+    Refugios disponibles
+  </h2>
+
+  <p className="text-gray-600">
+    Refugios que actualmente pueden recibir mascotas.
+  </p>
+
+</div>
+
+{/* FILTROS */}
+<div className="mb-8">
+
+  <input
+    type="text"
+    placeholder="Buscar por ciudad o provincia..."
+    value={filter}
+    onChange={(e) => setFilter(e.target.value)}
+    className="w-full p-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+  />
+
+  <div className="mt-4 flex justify-center gap-4 flex-wrap">
+
+    <button
+      onClick={() => setUrgent(!urgent)}
+      className={`px-6 py-3 rounded-full font-bold transition ${
+        urgent
+          ? 'bg-red-600 text-white animate-pulse'
+          : 'bg-gray-200 text-gray-800'
+      }`}
+    >
+      🚨 {urgent ? 'URGENCIA ACTIVADA' : 'ACTIVAR URGENCIA'}
+    </button>
+
+    <button
+  onClick={getLocation}
+  className="mt-4 bg-indigo-600 text-white px-6 py-3 rounded-full font-bold hover:bg-indigo-700 transition"
+>
+  📍 Buscar refugios cercanos
+</button>
+
+  </div>
+
+  {userLocation && (
+  <p className="text-center text-green-700 font-semibold mt-3">
+    📍 Mostrando refugios más cercanos
+  </p>
+)}
+
+</div>
+
 
         {/* LOADING */}
         {loading && (

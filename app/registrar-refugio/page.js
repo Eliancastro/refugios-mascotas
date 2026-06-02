@@ -5,13 +5,16 @@ import { supabase } from '../../lib/supabase';
 
 export default function RegistrarRefugio() {
   const [form, setForm] = useState({
-    name: '',
-    city: '',
-    province: '',
-    address: '',
-    phone: '',
-    has_capacity: true,
-  });
+  name: '',
+  city: '',
+  province: '',
+  address: '',
+  phone: '',
+  alias: '',
+  cvu: '',
+  mp_link: '',
+  has_capacity: true
+})
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -33,24 +36,34 @@ export default function RegistrarRefugio() {
   const { error } = await supabase
     .from('shelters')
     .insert([
-      {
-        ...form,
-        approved: false // 👈 CLAVE para la moderación
-      }
-    ])
+  {
+    ...form,
+
+    lat: Number(form.lat),
+    lng: Number(form.lng),
+
+    approved: false,
+    verified: false // 👈 CLAVE para la moderación
+  }
+])
 
   if (error) {
     setError(error.message)
   } else {
     setSuccess(true)
     setForm({
-      name: '',
-      city: '',
-      province: '',
-      address: '',
-      phone: '',
-      has_capacity: true,
-    })
+  name: '',
+  city: '',
+  province: '',
+  address: '',
+  phone: '',
+  alias: '',
+  cvu: '',
+  mp_link: '',
+  lat: '',
+  lng: '',
+  has_capacity: true,
+})
   }
 
   setLoading(false)
@@ -133,6 +146,71 @@ export default function RegistrarRefugio() {
       className="w-full p-3 border rounded"
     />
 
+    <input
+  type="text"
+  placeholder="Alias para donaciones"
+  value={form.alias}
+  onChange={(e) =>
+    setForm({
+      ...form,
+      alias: e.target.value
+    })
+  }
+  className="w-full p-3 border rounded"
+/>
+
+<input
+  type="text"
+  placeholder="CVU"
+  value={form.cvu}
+  onChange={(e) =>
+    setForm({
+      ...form,
+      cvu: e.target.value
+    })
+  }
+  className="w-full p-3 border rounded"
+/>
+
+<input
+  type="text"
+  placeholder="Link MercadoPago"
+  value={form.mp_link}
+  onChange={(e) =>
+    setForm({
+      ...form,
+      mp_link: e.target.value
+    })
+  }
+  className="w-full p-3 border rounded"
+/>
+
+<input
+  type="text"
+  placeholder="Latitud"
+  value={form.lat}
+  onChange={(e) =>
+    setForm({
+      ...form,
+      lat: e.target.value
+    })
+  }
+  className="w-full p-3 border rounded"
+/>
+
+<input
+  type="text"
+  placeholder="Longitud"
+  value={form.lng}
+  onChange={(e) =>
+    setForm({
+      ...form,
+      lng: e.target.value
+    })
+  }
+  className="w-full p-3 border rounded"
+/>
+
     <label className="flex items-center gap-2">
       <input
         type="checkbox"
@@ -155,4 +233,11 @@ export default function RegistrarRefugio() {
       </div>
     </main>
   );
+
+  const input = {
+  width: '100%',
+  padding: 12,
+  borderRadius: 8,
+  border: '1px solid #d1d5db'
+}
 }

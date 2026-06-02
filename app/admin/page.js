@@ -72,6 +72,20 @@ export default function AdminPage() {
     fetchShelters();
   };
 
+  const verifyShelter = async (id) => {
+
+  await supabase
+    .from('shelters')
+    .update({
+      verified: true
+    })
+    .eq('id', id)
+
+  setMessage('✅ Refugio verificado')
+
+  fetchShelters()
+}
+
   // ⭐ CAMBIAR DISPONIBILIDAD (PRO)
   const toggleCapacity = async (id, current) => {
     await supabase
@@ -146,6 +160,18 @@ export default function AdminPage() {
           </div>
         </section>
 
+        {/* REPORTES */}
+
+<section className="mb-10">
+
+  <h2 className="text-2xl font-bold mb-4 text-red-700">
+    🚨 Reportes
+  </h2>
+
+  <ReportsSection />
+
+</section>
+
         {/* APROBADOS */}
         <section>
           <h2 className="text-2xl font-bold mb-4 text-green-700">
@@ -175,9 +201,20 @@ export default function AdminPage() {
                     : '🔴 Sin lugar'}
                 </p>
 
-                <p className="text-sm text-gray-500">
-                  Aprobado ✔
-                </p>
+
+                <div className="mt-2 space-y-1">
+
+  <p className="text-sm text-gray-500">
+    Aprobado ✔
+  </p>
+
+  <p className="text-sm">
+    {shelter.verified
+      ? '✅ Verificado'
+      : '⚠️ No verificado'}
+  </p>
+
+</div>
 
                 {/* BOTON PRO */}
                 <button
@@ -190,6 +227,14 @@ export default function AdminPage() {
                     ? '🔴 Marcar sin lugar'
                     : '🟢 Marcar con lugar'}
                 </button>
+                {!shelter.verified && (
+  <button
+    onClick={() => verifyShelter(shelter.id)}
+    className="mt-3 bg-indigo-600 text-white px-4 py-2 rounded font-bold hover:bg-indigo-700"
+  >
+    ✅ Verificar refugio
+  </button>
+)}
               </div>
             ))}
           </div>
@@ -197,4 +242,61 @@ export default function AdminPage() {
       </div>
     </main>
   );
+}
+
+function ReportsSection() {
+
+  const [reports, setReports] = useState([])
+
+  useEffect(() => {
+    fetchReports()
+  }, [])
+
+  async function fetchReports() {
+
+    const { data } = await supabase
+      .from('reports')
+      .select('*')
+      .order('created_at', {
+        ascending: false
+      })
+
+    if (data) {
+      setReports(data)
+    }
+  }
+
+  if (reports.length === 0) {
+    return (
+      <p className="text-gray-500">
+        No hay reportes
+      </p>
+    )
+  }
+
+  return (
+    <div className="grid gap-4">
+
+      {reports.map((report) => (
+
+        <div
+          key={report.id}
+          className="bg-white p-4 rounded shadow border-l-4 border-red-500"
+        >
+
+          <p>
+            <strong>Tipo:</strong>{' '}
+            {report.target_type}
+          </p>
+
+          <p className="mt-2">
+            <strong>Motivo:</strong>{' '}
+            {report.reason}
+          </p>
+
+        </div>
+      ))}
+
+    </div>
+  )
 }

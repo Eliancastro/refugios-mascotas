@@ -1,4 +1,5 @@
 import "./globals.css";
+import Navbar from './components/Navbar'
 
 export const metadata = {
   title: "Refugios de Mascotas",
@@ -8,9 +9,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
-      <body className="bg-slate-100 text-slate-900">
+      <body>
+        <Navbar />
         {children}
       </body>
     </html>
-  );
+  )
 }
