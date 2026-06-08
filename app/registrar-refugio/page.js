@@ -3,6 +3,28 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 
+ async function getCoordinates(address, city, province) {
+
+  const query = encodeURIComponent(
+    `${address}, ${city}, ${province}, Argentina`
+  )
+
+  const response = await fetch(
+    `https://nominatim.openstreetmap.org/search?format=json&q=${query}`
+  )
+
+  const data = await response.json()
+
+  if (data.length > 0) {
+    return {
+      lat: parseFloat(data[0].lat),
+      lng: parseFloat(data[0].lon)
+    }
+  }
+
+  return null
+}
+
 export default function RegistrarRefugio() {
   const [form, setForm] = useState({
     name: '',
@@ -33,16 +55,32 @@ export default function RegistrarRefugio() {
     setLoading(true)
     setError(null)
 
+    const {
+  data: { user },
+} = await supabase.auth.getUser()
+
+const coords = await getCoordinates(
+  form.address,
+  form.city,
+  form.province
+)
+
     const { error } = await supabase.from('shelters').insert([
+
       {
         ...form,
+        
+        user_id: user.id,
 
-        lat: Number(form.lat),
-        lng: Number(form.lng),
+        lat: coords?.lat || null,
+        lng: coords?.lng || null,
 
         approved: false,
         verified: false, // 👈 CLAVE para la moderación
+
       },
+
+      
     ])
 
     if (error) {
@@ -58,8 +96,6 @@ export default function RegistrarRefugio() {
         alias: '',
         cvu: '',
         mp_link: '',
-        lat: '',
-        lng: '',
         has_capacity: true,
       })
     }
@@ -130,6 +166,7 @@ export default function RegistrarRefugio() {
               placeholder="Dirección"
               value={form.address}
               onChange={handleChange}
+              required
               className="w-full p-3 border rounded"
             />
 
@@ -181,36 +218,11 @@ export default function RegistrarRefugio() {
               className="w-full p-3 border rounded"
             />
 
-            <input
-              type="text"
-              placeholder="Latitud"
-              value={form.lat}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  lat: e.target.value,
-                })
-              }
-              className="w-full p-3 border rounded"
-            />
-
-            <input
-              type="text"
-              placeholder="Longitud"
-              value={form.lng}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  lng: e.target.value,
-                })
-              }
-              className="w-full p-3 border rounded"
-            />
-
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
                 name="has_capacity"
+                required
                 checked={form.has_capacity}
                 onChange={handleChange}
               />
@@ -230,10 +242,4 @@ export default function RegistrarRefugio() {
     </main>
   )
 
-  const input = {
-    width: '100%',
-    padding: 12,
-    borderRadius: 8,
-    border: '1px solid #d1d5db',
-  }
 }

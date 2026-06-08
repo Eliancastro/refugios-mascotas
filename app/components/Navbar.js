@@ -54,10 +54,17 @@ export default function Navbar() {
       </Link>
 
       {isMobile && (
-        <button onClick={() => setMenuOpen(!menuOpen)} style={hamburger}>
-          ☰
+        <button onClick={() => setMenuOpen(!menuOpen)} style={hamburger} >
+          {menuOpen ? '✕' : '☰'}
         </button>
       )}
+
+      {menuOpen && isMobile && (
+  <div
+    onClick={() => setMenuOpen(false)}
+    style={overlay}
+  />
+)}
 
       {/* LINKS */}
       <div
@@ -69,42 +76,63 @@ export default function Navbar() {
             : links
         }
       >
-        <Link href="/" style={link}>
+        <Link href="/" style={link} onClick={() => setMenuOpen(false)}>
+        
           Inicio
         </Link>
 
-        <Link href="/mascotas" style={link}>
+        <Link href="/mascotas" style={link} onClick={() => setMenuOpen(false)}>
+        
           Mascotas
         </Link>
 
         {user && (
           <>
-            <Link href="/mascotas/nueva" style={link}>
+            <Link href="/mascotas/nueva" style={link} onClick={() => setMenuOpen(false)}>
+            
               Publicar
             </Link>
 
-            <Link href="/favoritos" style={link}>
+            <Link href="/favoritos" style={link} onClick={() => setMenuOpen(false)}>
+            
               Favoritos
             </Link>
 
-            <Link href="/mis-publicaciones" style={link}>
+            <Link href="/mis-publicaciones" style={link} onClick={() => setMenuOpen(false)}>
+            
               Mis publicaciones
             </Link>
+
+            <Link
+  href="/mis-refugios"
+  style={link}
+  onClick={() => setMenuOpen(false)}
+>
+  Mis refugios
+</Link>
           </>
         )}
 
         {!user ? (
           <>
-            <Link href="/login" style={link}>
+            <Link href="/login" style={link} onClick={() => setMenuOpen(false)}>
+            
               Login
             </Link>
 
-            <Link href="/register" style={registerButton}>
+            <Link href="/register" style={registerButton} onClick={() => setMenuOpen(false)}>
+            
               Registrarse
             </Link>
           </>
         ) : (
-          <button onClick={handleLogout} style={logoutButton}>
+          <button
+  onClick={() => {
+    setMenuOpen(false)
+    handleLogout()
+  }}
+  style={logoutButton}
+>
             Cerrar sesión
           </button>
         )}
@@ -198,4 +226,12 @@ const mobileMenuOpen = {
   flexDirection: 'column',
   alignItems: 'flex-start',
   gap: 16,
+  zIndex: 1000,
+}
+
+const overlay = {
+  position: 'fixed',
+  inset: 0,
+  background: 'transparent',
+  zIndex: 998,
 }

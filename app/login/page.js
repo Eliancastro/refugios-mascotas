@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -61,6 +62,10 @@ export default function LoginPage() {
           <button type="submit" style={button} disabled={loading}>
             {loading ? 'Ingresando...' : 'Ingresar'}
           </button>
+
+          <Link href="/reset-password">
+           ¿Olvidaste tu contraseña?
+          </Link>
         </form>
       </div>
     </div>

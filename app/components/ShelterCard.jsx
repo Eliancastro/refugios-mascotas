@@ -1,5 +1,7 @@
 import { supabase } from '../../lib/supabase'
+import { useEffect, useState } from 'react'
 export default function ShelterCard({ shelter, urgent }) {
+  const [currentUser, setCurrentUser] = useState(null)
   // ===== ESTADO VISUAL =====
   let statusLabel = ''
   let statusColor = ''
@@ -14,6 +16,18 @@ export default function ShelterCard({ shelter, urgent }) {
     statusLabel = '🔴 SIN LUGAR'
     statusColor = 'bg-gray-400'
   }
+
+  useEffect(() => {
+    async function getUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      setCurrentUser(user)
+    }
+
+    getUser()
+  }, [])
 
   async function reportarRefugio() {
     const motivo = prompt('¿Por qué querés reportar este refugio?')
@@ -139,10 +153,26 @@ export default function ShelterCard({ shelter, urgent }) {
           </div>
         )}
 
+        {currentUser?.id === shelter.user_id && (
+          <a
+            href={`/refugios/${shelter.id}/editar`}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-bold text-center transition"
+          >
+            ✏️ Editar refugio
+          </a>
+        )}
+
         {/* REPORTAR */}
         <button className="text-red-500 text-sm font-bold hover:underline text-left">
           🚨 Reportar refugio
         </button>
+
+        <a
+          href={`/refugios/editar/${shelter.id}`}
+          className="mt-2 block text-center bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-xl font-bold transition"
+        >
+          ✏️ Editar refugio
+        </a>
       </div>
     </div>
   )
