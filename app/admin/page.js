@@ -11,13 +11,23 @@ export default function AdminPage() {
   const [message, setMessage] = useState(null)
 
   useEffect(() => {
-    const pass = prompt('Contraseña de administrador')
-    if (pass === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
-      setAuthorized(true)
-    } else {
-      alert('Acceso denegado')
-    }
-  }, [])
+  checkAdmin()
+}, [])
+
+async function checkAdmin() {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (
+    session?.user?.email === 'eliancastro98@gmail.com'
+  ) {
+    setAuthorized(true)
+  } else {
+    alert('Acceso denegado')
+  }
+  setLoading(false)
+}
 
   useEffect(() => {
     if (authorized) fetchShelters()
@@ -86,6 +96,14 @@ export default function AdminPage() {
 
     fetchShelters()
   }
+
+  if (loading) {
+  return (
+    <main className="min-h-screen flex items-center justify-center">
+      <p>Cargando...</p>
+    </main>
+  )
+}
 
   return (
     <main className="min-h-screen bg-gray-100 p-6">

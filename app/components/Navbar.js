@@ -13,8 +13,18 @@ export default function Navbar() {
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
-    getUser()
-  }, [])
+  getUser()
+
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((_event, session) => {
+    setUser(session?.user || null)
+  })
+
+  return () => {
+    subscription.unsubscribe()
+  }
+}, [])
 
   useEffect(() => {
     function handleResize() {
@@ -45,6 +55,16 @@ export default function Navbar() {
 
     router.push('/login')
   }
+
+  async function handleLogout() {
+  await supabase.auth.signOut()
+
+  setUser(null)
+
+  router.refresh()
+
+  router.push('/login')
+}
 
   return (
     <nav style={nav}>
