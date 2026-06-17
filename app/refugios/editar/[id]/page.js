@@ -48,31 +48,30 @@ export default function EditarRefugioPage() {
     fetchShelter()
   }, [])
 
-  
-async function fetchShelter() {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  async function fetchShelter() {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
 
-  const { data, error } = await supabase
-    .from('shelters')
-    .select('*')
-    .eq('id', params.id)
-    .single()
+    const { data, error } = await supabase
+      .from('shelters')
+      .select('*')
+      .eq('id', params.id)
+      .single()
 
-  if (error || !data) {
-    router.push('/')
-    return
+    if (error || !data) {
+      router.push('/')
+      return
+    }
+
+    if (data.user_id !== user?.id) {
+      router.push('/')
+      return
+    }
+
+    setForm(data)
+    setLoading(false)
   }
-
-  if (data.user_id !== user?.id) {
-    router.push('/')
-    return
-  }
-
-  setForm(data)
-  setLoading(false)
-}
 
   function handleChange(e) {
     const { name, value, type, checked } = e.target
@@ -88,11 +87,7 @@ async function fetchShelter() {
 
     setSaving(true)
 
-    const coords = await getCoordinates(
-      form.address,
-      form.city,
-      form.province
-    )
+    const coords = await getCoordinates(form.address, form.city, form.province)
 
     const { error } = await supabase
       .from('shelters')
@@ -121,13 +116,9 @@ async function fetchShelter() {
   return (
     <main className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-xl mx-auto bg-white rounded-xl shadow p-6">
-
-        <h1 className="text-3xl font-bold mb-6">
-          ✏️ Editar refugio
-        </h1>
+        <h1 className="text-3xl font-bold mb-6">✏️ Editar refugio</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-
           <input
             name="name"
             placeholder="Nombre"
@@ -199,7 +190,6 @@ async function fetchShelter() {
               checked={form.has_capacity}
               onChange={handleChange}
             />
-
             Tengo lugar disponible
           </label>
 
@@ -210,7 +200,6 @@ async function fetchShelter() {
           >
             {saving ? 'Guardando...' : 'Guardar cambios'}
           </button>
-
         </form>
       </div>
     </main>

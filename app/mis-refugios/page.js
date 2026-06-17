@@ -38,37 +38,24 @@ export default function MisRefugiosPage() {
 
   return (
     <main className="max-w-5xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">
-        Mis refugios
-      </h1>
+      <h1 className="text-3xl font-bold mb-6">Mis refugios</h1>
 
       {refugios.length === 0 ? (
         <p>No tenés refugios registrados.</p>
       ) : (
         <div className="grid gap-4">
           {refugios.map((r) => (
-            <div
-              key={r.id}
-              className="bg-white rounded-xl shadow p-4"
-            >
-              <h2 className="font-bold text-xl">
-                {r.name}
-              </h2>
+            <div key={r.id} className="bg-white rounded-xl shadow p-4">
+              <h2 className="font-bold text-xl">{r.name}</h2>
 
               <p>
                 {r.city} - {r.province}
               </p>
 
-              <p>
-                {r.approved
-                  ? '✅ Aprobado'
-                  : '⏳ Pendiente'}
-              </p>
+              <p>{r.approved ? '✅ Aprobado' : '⏳ Pendiente'}</p>
 
               <button
-                onClick={() =>
-                  router.push(`/refugios/editar/${r.id}`)
-                }
+                onClick={() => router.push(`/refugios/editar/${r.id}`)}
                 className="mt-3 bg-indigo-600 text-white px-4 py-2 rounded"
               >
                 Editar
@@ -80,4 +67,3 @@ export default function MisRefugiosPage() {
     </main>
   )
 }
-

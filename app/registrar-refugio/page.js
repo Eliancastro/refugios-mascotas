@@ -3,8 +3,7 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 
- async function getCoordinates(address, city, province) {
-
+async function getCoordinates(address, city, province) {
   const query = encodeURIComponent(
     `${address}, ${city}, ${province}, Argentina`
   )
@@ -18,7 +17,7 @@ import { supabase } from '../../lib/supabase'
   if (data.length > 0) {
     return {
       lat: parseFloat(data[0].lat),
-      lng: parseFloat(data[0].lon)
+      lng: parseFloat(data[0].lon),
     }
   }
 
@@ -56,20 +55,15 @@ export default function RegistrarRefugio() {
     setError(null)
 
     const {
-  data: { user },
-} = await supabase.auth.getUser()
+      data: { user },
+    } = await supabase.auth.getUser()
 
-const coords = await getCoordinates(
-  form.address,
-  form.city,
-  form.province
-)
+    const coords = await getCoordinates(form.address, form.city, form.province)
 
     const { error } = await supabase.from('shelters').insert([
-
       {
         ...form,
-        
+
         user_id: user.id,
 
         lat: coords?.lat || null,
@@ -77,10 +71,7 @@ const coords = await getCoordinates(
 
         approved: false,
         verified: false, // 👈 CLAVE para la moderación
-
       },
-
-      
     ])
 
     if (error) {
@@ -241,5 +232,4 @@ const coords = await getCoordinates(
       </div>
     </main>
   )
-
 }

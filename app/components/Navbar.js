@@ -13,18 +13,18 @@ export default function Navbar() {
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
-  getUser()
+    getUser()
 
-  const {
-    data: { subscription },
-  } = supabase.auth.onAuthStateChange((_event, session) => {
-    setUser(session?.user || null)
-  })
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null)
+    })
 
-  return () => {
-    subscription.unsubscribe()
-  }
-}, [])
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [])
 
   useEffect(() => {
     function handleResize() {
@@ -57,14 +57,14 @@ export default function Navbar() {
   }
 
   async function handleLogout() {
-  await supabase.auth.signOut()
+    await supabase.auth.signOut()
 
-  setUser(null)
+    setUser(null)
 
-  router.refresh()
+    router.refresh()
 
-  router.push('/login')
-}
+    router.push('/login')
+  }
 
   return (
     <nav style={nav}>
@@ -74,17 +74,14 @@ export default function Navbar() {
       </Link>
 
       {isMobile && (
-        <button onClick={() => setMenuOpen(!menuOpen)} style={hamburger} >
+        <button onClick={() => setMenuOpen(!menuOpen)} style={hamburger}>
           {menuOpen ? '✕' : '☰'}
         </button>
       )}
 
       {menuOpen && isMobile && (
-  <div
-    onClick={() => setMenuOpen(false)}
-    style={overlay}
-  />
-)}
+        <div onClick={() => setMenuOpen(false)} style={overlay} />
+      )}
 
       {/* LINKS */}
       <div
@@ -97,62 +94,91 @@ export default function Navbar() {
         }
       >
         <Link href="/" style={link} onClick={() => setMenuOpen(false)}>
-        
           Inicio
         </Link>
 
         <Link href="/mascotas" style={link} onClick={() => setMenuOpen(false)}>
-        
           Mascotas
+        </Link>
+
+        <Link
+          href="/quienes-somos"
+          style={link}
+          onClick={() => setMenuOpen(false)}
+        >
+          Quiénes somos
+        </Link>
+
+        <Link href="/contacto" style={link} onClick={() => setMenuOpen(false)}>
+          Contacto
+        </Link>
+
+        <Link
+          href="/politica-privacidad"
+          style={link}
+          onClick={() => setMenuOpen(false)}
+        >
+          Privacidad
         </Link>
 
         {user && (
           <>
-            <Link href="/mascotas/nueva" style={link} onClick={() => setMenuOpen(false)}>
-            
+            <Link
+              href="/mascotas/nueva"
+              style={link}
+              onClick={() => setMenuOpen(false)}
+            >
               Publicar
             </Link>
 
-            <Link href="/favoritos" style={link} onClick={() => setMenuOpen(false)}>
-            
+            <Link
+              href="/favoritos"
+              style={link}
+              onClick={() => setMenuOpen(false)}
+            >
               Favoritos
             </Link>
 
-            <Link href="/mis-publicaciones" style={link} onClick={() => setMenuOpen(false)}>
-            
+            <Link
+              href="/mis-publicaciones"
+              style={link}
+              onClick={() => setMenuOpen(false)}
+            >
               Mis publicaciones
             </Link>
 
             <Link
-  href="/mis-refugios"
-  style={link}
-  onClick={() => setMenuOpen(false)}
->
-  Mis refugios
-</Link>
+              href="/mis-refugios"
+              style={link}
+              onClick={() => setMenuOpen(false)}
+            >
+              Mis refugios
+            </Link>
           </>
         )}
 
         {!user ? (
           <>
             <Link href="/login" style={link} onClick={() => setMenuOpen(false)}>
-            
               Login
             </Link>
 
-            <Link href="/register" style={registerButton} onClick={() => setMenuOpen(false)}>
-            
+            <Link
+              href="/register"
+              style={registerButton}
+              onClick={() => setMenuOpen(false)}
+            >
               Registrarse
             </Link>
           </>
         ) : (
           <button
-  onClick={() => {
-    setMenuOpen(false)
-    handleLogout()
-  }}
-  style={logoutButton}
->
+            onClick={() => {
+              setMenuOpen(false)
+              handleLogout()
+            }}
+            style={logoutButton}
+          >
             Cerrar sesión
           </button>
         )}

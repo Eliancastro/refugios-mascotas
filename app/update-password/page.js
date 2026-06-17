@@ -34,9 +34,7 @@ export default function UpdatePasswordPage() {
   return (
     <main className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-md mx-auto bg-white rounded-xl shadow p-6">
-        <h1 className="text-3xl font-bold mb-6">
-          🔒 Nueva contraseña
-        </h1>
+        <h1 className="text-3xl font-bold mb-6">🔒 Nueva contraseña</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
@@ -53,13 +51,10 @@ export default function UpdatePasswordPage() {
             disabled={loading}
             className="w-full bg-indigo-600 text-white py-3 rounded"
           >
-            {loading
-              ? 'Actualizando...'
-              : 'Guardar contraseña'}
+            {loading ? 'Actualizando...' : 'Guardar contraseña'}
           </button>
         </form>
       </div>
     </main>
   )
 }
-

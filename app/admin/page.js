@@ -11,23 +11,21 @@ export default function AdminPage() {
   const [message, setMessage] = useState(null)
 
   useEffect(() => {
-  checkAdmin()
-}, [])
+    checkAdmin()
+  }, [])
 
-async function checkAdmin() {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  async function checkAdmin() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
 
-  if (
-    session?.user?.email === 'eliancastro98@gmail.com'
-  ) {
-    setAuthorized(true)
-  } else {
-    alert('Acceso denegado')
+    if (session?.user?.email === 'eliancastro98@gmail.com') {
+      setAuthorized(true)
+    } else {
+      alert('Acceso denegado')
+    }
+    setLoading(false)
   }
-  setLoading(false)
-}
 
   useEffect(() => {
     if (authorized) fetchShelters()
@@ -98,12 +96,12 @@ async function checkAdmin() {
   }
 
   if (loading) {
-  return (
-    <main className="min-h-screen flex items-center justify-center">
-      <p>Cargando...</p>
-    </main>
-  )
-}
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <p>Cargando...</p>
+      </main>
+    )
+  }
 
   return (
     <main className="min-h-screen bg-gray-100 p-6">
