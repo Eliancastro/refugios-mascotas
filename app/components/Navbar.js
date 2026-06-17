@@ -10,7 +10,7 @@ export default function Navbar() {
 
   const [user, setUser] = useState(null)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState(null)
 
   useEffect(() => {
     getUser()
@@ -53,17 +53,13 @@ export default function Navbar() {
 
     setUser(null)
 
-    router.push('/login')
-  }
-
-  async function handleLogout() {
-    await supabase.auth.signOut()
-
-    setUser(null)
-
     router.refresh()
 
     router.push('/login')
+  }
+
+  if (isMobile === null) {
+    return null
   }
 
   return (
